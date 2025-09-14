@@ -3,6 +3,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
 import java.util.Stack;
@@ -902,21 +903,32 @@ public class DataStructures {
     }
 
     public static boolean searchMatrix(int[][] matrix, int target) {
-        for (int i = 0; i < matrix.length; i++) {
-            int leftJ = 0; 
-            int rightJ = matrix[i].length;
-            while (leftJ < rightJ) {
-                int midJ = leftJ + (rightJ - leftJ) / 2;
-                if (matrix[i][midJ] == target) {
-                    return true;
-                }
-
-                if (target > matrix[i][midJ]) {
-                    leftJ = midJ + 1;
-                } else {
-                    rightJ = midJ - 1;
-                }
+        int leftI = 0;
+        int rightI = matrix.length - 1;
+        while (leftI <= rightI) {
+            int midI = leftI + (rightI - leftI) / 2;
+            if (matrix[midI][0] == target) {
+                return true;
             }
+            if (target > matrix[midI][0]) {
+                int leftJ = 0; 
+                int rightJ = matrix[midI].length - 1;
+                while (leftJ <= rightJ) {
+                    int midJ = leftJ + (rightJ - leftJ) / 2;
+                    if (matrix[midI][midJ] == target) {
+                        return true;
+                    }
+
+                    if (target > matrix[midI][midJ]) {
+                        leftJ = midJ + 1;
+                    } else {
+                        rightJ = midJ - 1;
+                    }
+                }
+                leftI = midI + 1;
+            } else {
+                rightI = midI - 1;
+            }          
         }
 
         return false;
@@ -1004,6 +1016,36 @@ public class DataStructures {
             lookUp.add(letters[i]);
             maxLength = Math.max(maxLength, i - left + 1);
 
+        }
+    }
+
+
+    static class KthLargest {
+
+        private List<Integer> numbers;
+        private PriorityQueue<Integer> queue;
+        private int k;
+
+        public KthLargest(int k, int[] nums) {
+            this.k = k;
+            numbers = new ArrayList<>();
+            queue = new PriorityQueue<>();
+            for (int num : nums) {
+                queue.add(num);
+                numbers.add(num);
+            }
+
+            while (queue.size() > k) {
+                queue.poll();
+            }
+        }
+        
+        public int add(int val) {
+            queue.add(val);
+            while (queue.size() > k) {
+                queue.poll();
+            }
+            return queue.peek();
         }
     }
    
