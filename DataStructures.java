@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
@@ -14,6 +15,7 @@ import java.util.stream.Collectors;
 import javax.swing.tree.TreeNode;
 
 import java.util.Arrays;
+import java.util.Comparator;
 
 public class DataStructures {
 
@@ -1030,6 +1032,7 @@ public class DataStructures {
             this.k = k;
             numbers = new ArrayList<>();
             queue = new PriorityQueue<>();
+            //queue = new PriorityQueue<>(Comparator.reverseOrder()); MaxHEap
             for (int num : nums) {
                 queue.add(num);
                 numbers.add(num);
@@ -1048,6 +1051,100 @@ public class DataStructures {
             return queue.peek();
         }
     }
+
+    public static int ladderLength(String beginWord, String endWord, List<String> wordList) {
+        //Will store the words that belogs to a pattern
+        Map<String, Set<String>> patternsDictionary = new HashMap<>();   
+        Set<String> wordSet = new HashSet<>(wordList);
+
+        if (!wordSet.contains(endWord)) return 0;
+
+        for (String word : wordList) {
+            for(int i = 0; i < beginWord.length(); i++) {
+                String pattern = word.substring(0, i) + "*" + word.substring(i+1);
+                patternsDictionary.computeIfAbsent(pattern, k -> new HashSet<>()).add(word);
+            } 
+        } 
+
+        Queue<String> dequeue = new LinkedList<>();
+        Set<String> visited = new HashSet<>();
+        dequeue.add(beginWord);
+        visited.add(beginWord);
+        int pathSize = 1;
+        while(!dequeue.isEmpty()) {
+            int size = dequeue.size();
+            for (int i = 0; i < size; i++) {
+                String currentWord = dequeue.poll();
+               
+                for (int j = 0; j < beginWord.length(); j++) {
+
+                    String pattern = currentWord.substring(0, j) + "*" + currentWord.substring(j+1);
+                    Set<String> neighbors = patternsDictionary.getOrDefault(pattern, new HashSet<>());              
+                    for (String neighbor : neighbors) {
+                        if (neighbor.equals(endWord)) {
+                            return pathSize + 1;
+                        }
+                        if (!visited.contains(neighbor)) {
+                            visited.add(neighbor);
+                            dequeue.add(neighbor);
+                        }
+                    }
+
+                }  
+            }
+            pathSize++;
+        }
+
+        return 0;
+    }
+
+    public static int ladderLengthV2(String beginWord, String endWord, List<String> wordList) {
+        Map<String, Set<String>> patternsDictionary = new HashMap<>();
+        Set<String> wordSet = new HashSet<>(wordList);
+
+        if (!wordSet.contains(endWord)) return 0;
+
+        int wordLength = beginWord.length();
+
+        for (String word : wordList) {
+            for (int i = 0; i < wordLength; i++) {
+                String pattern = word.substring(0, i) + "*" + word.substring(i + 1);
+                patternsDictionary.computeIfAbsent(pattern, k -> new HashSet<>()).add(word);
+            }
+        }
+
+        Queue<String> dequeue = new LinkedList<>();
+        Set<String> visited = new HashSet<>();
+        dequeue.add(beginWord);
+        visited.add(beginWord);
+        int pathSize = 1;
+
+        while (!dequeue.isEmpty()) {
+            int size = dequeue.size();
+            for (int i = 0; i < size; i++) {
+                String currentWord = dequeue.poll();
+
+                for (int j = 0; j < wordLength; j++) {
+                    String pattern = currentWord.substring(0, j) + "*" + currentWord.substring(j + 1);
+                    Set<String> neighbors = patternsDictionary.getOrDefault(pattern, new HashSet<>());
+
+                    for (String neighbor : neighbors) {
+                        if (neighbor.equals(endWord)) {
+                            return pathSize + 1;
+                        }
+                        if (!visited.contains(neighbor)) {
+                            visited.add(neighbor);
+                            dequeue.add(neighbor);
+                        }
+                    }
+                }
+            }
+            pathSize++;
+        }
+
+        return 0;
+    }
+
    
     public static void main(String[] args) {
         // int[] prices = { 7,1,5,3,6,4};
